@@ -10,15 +10,15 @@ async function startServer() {
   // เริ่มเซิร์ฟเวอร์
   const app = express();
 
+  // ใช้ CORS middleware ก่อน middleware อื่น
+  app.use(configureCORS());
+
   // Logging middleware เพื่อตรวจสอบ request
   app.use((req, res, next) => {
-    console.log(`[CORS DEBUG] Request from: ${req.headers.origin}`);
-    console.log(`[CORS DEBUG] Request method: ${req.method}`);
+    console.log(`✅ Request from: ${req.headers.origin || 'No origin'}`);
+    console.log(`✅ Request method: ${req.method}`);
     next();
   });
-
-  // ใช้ CORS middleware
-  app.use(configureCORS());
 
   // Middleware เพื่อบันทึก CORS errors
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
