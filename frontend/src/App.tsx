@@ -1,12 +1,20 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from './components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from './components/ui/avatar'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs'
-import { Dialog, DialogContent } from './components/ui/dialog'
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, VisuallyHidden } from './components/ui/dialog'
+import MembershipDashboard from './components/MembershipDashboard'
+import MembershipPlans from './components/MembershipPlans'
+import PaymentGateway from './components/PaymentGateway'
+import PaymentSuccess from './components/PaymentSuccess'
+import LoginModal from './components/LoginModal'
+import UserProfile from './components/UserProfile'
+import ChatRoomList from './components/ChatRoomList'
+import RealTimeChat from './components/RealTimeChat'
+import CreatePrivateRoomModal from './components/CreatePrivateRoomModal'
+import AIMatchingSystem from './components/AIMatchingSystem'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { ToastProvider, useToast } from './components/ui/toast'
-
-// Lucide React icons
 import { 
   Heart, 
   Search, 
@@ -51,70 +59,46 @@ import {
   Wine
 } from 'lucide-react'
 
-// Lazy load components
-const MembershipDashboard = lazy(() => import('./components/MembershipDashboard'))
-const MembershipPlans = lazy(() => import('./components/MembershipPlans'))
-const PaymentGateway = lazy(() => import('./components/PaymentGateway'))
-const PaymentSuccess = lazy(() => import('./components/PaymentSuccess'))
-const LoginModal = lazy(() => import('./components/LoginModal'))
-const UserProfile = lazy(() => import('./components/UserProfile'))
-const ChatRoomList = lazy(() => import('./components/ChatRoomList'))
-const RealTimeChat = lazy(() => import('./components/RealTimeChat'))
-const CreatePrivateRoomModal = lazy(() => import('./components/CreatePrivateRoomModal'))
-const AIMatchingSystem = lazy(() => import('./components/AIMatchingSystem'))
-
-// Comprehensive PublicUser interface
+// Expanded interfaces to include all used properties
 interface PublicUser {
   _id?: string;
-  id: string;
+  id?: string | number;
   nickname?: string;
   firstName?: string;
   lastName?: string;
-  username?: string;
   age?: number | string;
-  location?: string;
-  bio?: string;
   isVerified?: boolean;
   isOnline?: boolean;
+  profileImage?: string;
   profileImages?: string[];
+  username?: string;
+  location?: string;
+  bio?: string;
   interests?: any[];
   membership?: { tier?: string };
 }
 
-// Comprehensive FeaturedProfile interface
-interface FeaturedProfile {
-  id: string;
+interface FeaturedProfile extends PublicUser {
   name?: string;
-  age?: number;
-  location?: string;
   distance?: string;
-  bio?: string;
-  interests?: string[];
   images?: string[];
-  verified?: boolean;
+  voteCount?: number;
   online?: boolean;
+  verified?: boolean;
   lastActive?: string;
-  height?: string;
-  education?: string;
   job?: string;
-  lifestyle?: string;
-  lookingFor?: string;
+  height?: string;
   languages?: string[];
+  education?: string;
   personality?: string;
-}
-
-// Helper function to convert age to number
-function toNumber(age: string | number | undefined): number | undefined {
-  if (age === undefined) return undefined;
-  if (typeof age === 'number') return age;
-  const parsed = parseInt(age, 10);
-  return isNaN(parsed) ? undefined : parsed;
+  lookingFor?: string;
+  lifestyle?: string;
 }
 
 // Sample profile data
 const profiles: FeaturedProfile[] = [
   {
-    id: '1',
+    id: 1,
     name: 'Sophie',
     age: 28,
     location: 'Bangkok',
@@ -136,12 +120,13 @@ const profiles: FeaturedProfile[] = [
     lifestyle: 'Non-smoker, occasional drinker',
     lookingFor: 'Long-term relationship',
     languages: ['English', 'Thai'],
-    personality: 'Introverted but social when comfortable'
+    personality: 'Introverted but social when comfortable',
+    membership: { tier: 'vip' }
   },
   {
-    id: '2',
-    age: 31,
+    id: 2,
     name: 'Alex',
+    age: 31,
     location: 'Bangkok',
     distance: '5 km',
     bio: 'Photographer and foodie. Let\'s explore new restaurants and capture beautiful moments together. Passionate about art, music, and creating authentic experiences.',
@@ -161,12 +146,13 @@ const profiles: FeaturedProfile[] = [
     lifestyle: 'Non-smoker, enjoys wine',
     lookingFor: 'Serious relationship',
     languages: ['English', 'Spanish'],
-    personality: 'Extroverted and adventurous'
+    personality: 'Extroverted and adventurous',
+    membership: { tier: 'gold' }
   },
   {
-    id: '3',
-    age: 26,
+    id: 3,
     name: 'Emma',
+    age: 26,
     location: 'Bangkok',
     distance: '7 km',
     bio: 'Yoga instructor and plant mom. Seeking someone with positive energy and an open mind. Let\'s grow together, both literally and figuratively.',
@@ -186,12 +172,13 @@ const profiles: FeaturedProfile[] = [
     lifestyle: 'Vegetarian, non-smoker',
     lookingFor: 'Meaningful connection',
     languages: ['English', 'Mandarin'],
-    personality: 'Calm and empathetic'
+    personality: 'Calm and empathetic',
+    membership: { tier: 'silver' }
   },
   {
-    id: '4',
-    age: 30,
+    id: 4,
     name: 'Daniel',
+    age: 30,
     location: 'Bangkok',
     distance: '4 km',
     bio: 'Software engineer by day, musician by night. Looking for someone to share both quiet evenings and concert adventures. Let\'s create our own soundtrack.',
@@ -211,12 +198,13 @@ const profiles: FeaturedProfile[] = [
     lifestyle: 'Occasional drinker, non-smoker',
     lookingFor: 'Relationship with growth potential',
     languages: ['English', 'Japanese'],
-    personality: 'Thoughtful and analytical'
+    personality: 'Thoughtful and analytical',
+    membership: { tier: 'vip1' }
   },
   {
-    id: '5',
-    age: 27,
+    id: 5,
     name: 'Lily',
+    age: 27,
     location: 'Bangkok',
     distance: '6 km',
     bio: 'Art lover and coffee connoisseur. Let\'s create beautiful memories together. I believe every day is an opportunity for inspiration and connection.',
@@ -236,12 +224,13 @@ const profiles: FeaturedProfile[] = [
     lifestyle: 'Non-smoker, enjoys craft coffee',
     lookingFor: 'Creative partnership',
     languages: ['English', 'French'],
-    personality: 'Expressive and intuitive'
+    personality: 'Expressive and intuitive',
+    membership: { tier: 'diamond' }
   },
   {
-    id: '6',
-    age: 32,
+    id: 6,
     name: 'James',
+    age: 32,
     location: 'Bangkok',
     distance: '8 km',
     bio: 'Adventure seeker and food explorer. Looking for someone to share life\'s journeys with. Let\'s make every meal an adventure and every weekend a discovery.',
@@ -261,7 +250,8 @@ const profiles: FeaturedProfile[] = [
     lifestyle: 'Non-smoker, occasional drinker',
     lookingFor: 'Adventure partner for life',
     languages: ['English', 'German'],
-    personality: 'Bold and spontaneous'
+    personality: 'Bold and spontaneous',
+    membership: { tier: 'platinum' }
   }
 ]
 
@@ -305,16 +295,33 @@ const messages = [
   }
 ]
 
-// Type guard for image error event
-const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-  const target = e.target as HTMLImageElement;
-  target.src = 'https://placehold.co/500x600/6366f1/ffffff?text=No+Image';
-};
+// Error handling type guard
+function isErrorWithMessage(error: unknown): error is { message: string } {
+  return (
+    typeof error === 'object' && 
+    error !== null && 
+    'message' in error && 
+    typeof (error as { message: unknown }).message === 'string'
+  )
+}
+
+// Image error handling type guard
+function isImageElement(target: EventTarget | null): target is HTMLImageElement {
+  return target instanceof HTMLImageElement;
+}
+
+// In image error handling functions
+const handleProfileImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+  const target = e.target;
+  if (isImageElement(target)) {
+    target.src = 'https://placehold.co/500x600/6366f1/ffffff?text=No+Image';
+  }
+}
 
 function App() {
   const { user, login, logout, loading } = useAuth()
   const { ToastContainer } = useToast()
-  const [activeTab, setActiveTab] = useState<"discover" | "matches" | "messages" | "membership" | "profile">("discover")
+  const [activeTab, setActiveTab] = useState<'discover' | 'matches' | 'messages' | 'membership' | 'profile'>('discover')
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [selectedProfile, setSelectedProfile] = useState<FeaturedProfile | null>(null)
   const [showProfileModal, setShowProfileModal] = useState(false)
@@ -1205,7 +1212,7 @@ function App() {
                               }
                             } catch (error) {
                               console.error('❌ Search error:', error)
-                              alert(`❌ เกิดข้อผิดพลาดในการค้นหา: ${error.message}`)
+                              alert(`❌ เกิดข้อผิดพลาดในการค้นหา: ${isErrorWithMessage(error) ? error.message : 'Unknown error'}`)
                             } finally {
                               setIsLoadingAllUsers(false)
                             }
@@ -1286,7 +1293,7 @@ function App() {
                               }
                             } catch (error) {
                               console.error('❌ Reset error:', error)
-                              alert(`❌ เกิดข้อผิดพลาดในการรีเซ็ต: ${error.message}`)
+                              alert(`❌ เกิดข้อผิดพลาดในการรีเซ็ต: ${isErrorWithMessage(error) ? error.message : 'Unknown error'}`)
                             } finally {
                               setIsLoadingAllUsers(false)
                             }
@@ -1344,9 +1351,9 @@ function App() {
                         className="modern-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-pink-100/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer group"
                         onClick={() => {
                           const modalProfile: FeaturedProfile = {
-                            id: u._id || '',
-                            age: toNumber(u?.age),
+                            id: u._id,
                             name: displayName,
+                            age: u?.age,
                             location: u?.location || 'Thailand',
                             distance: 'Premium',
                             bio: u?.bio || '',
@@ -1478,9 +1485,9 @@ function App() {
                     
                     return (
                       <div key={user._id} className="modern-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-pink-100/50 transition-all duration-500 hover:-translate-y-2 cursor-pointer group floating-hearts" onClick={() => openProfileModal({
-                        id: user._id || '',
-                        age: toNumber(user.age),
+                        id: user._id,
                         name: displayName,
+                        age: age,
                         location: location,
                         bio: bio,
                         interests: interests,
@@ -1491,9 +1498,9 @@ function App() {
                         <div className="h-72 overflow-hidden relative">
                           <img 
                             src={profileImage} 
+                            onError={handleProfileImageError}
                             alt={displayName} 
                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                            onError={handleImageError}
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                           {user.isVerified && (
@@ -1646,9 +1653,7 @@ function App() {
                   </Button>
                 </div>
               ) : (
-                <Suspense fallback={<div>Loading AI Matching...</div>}>
-                  <AIMatchingSystem currentUser={user} />
-                </Suspense>
+                <AIMatchingSystem currentUser={user} />
               )}
             </TabsContent>
             {/* Messages Tab */}
@@ -1662,43 +1667,35 @@ function App() {
                   </Button>
                 </div>
               ) : chatView === 'list' ? (
-                <Suspense fallback={<div>Loading Chat Rooms...</div>}>
-                  <ChatRoomList
-                    currentUser={user}
-                    onSelectRoom={handleSelectRoom}
-                    onCreatePrivateRoom={() => setShowCreateRoomModal(true)}
-                  />
-                </Suspense>
+                <ChatRoomList
+                  currentUser={user}
+                  onSelectRoom={handleSelectRoom}
+                  onCreatePrivateRoom={() => setShowCreateRoomModal(true)}
+                />
               ) : (
-                <Suspense fallback={<div>Loading Chat...</div>}>
-                  <RealTimeChat
-                    roomId={selectedRoomId}
-                    currentUser={user}
-                    onBack={handleBackToRoomList}
-                  />
-                </Suspense>
+                <RealTimeChat
+                  roomId={selectedRoomId}
+                  currentUser={user}
+                  onBack={handleBackToRoomList}
+                />
               )}
             </TabsContent>
             {/* Membership Tab */}
             <TabsContent value="membership" className="p-6">
-              <Suspense fallback={<div>Loading Membership...</div>}>
+              <div className="space-y-8">
                 <MembershipDashboard userId={user?._id} />
-              </Suspense>
-              <div className="border-t border-slate-200 pt-8">
-                <Suspense fallback={<div>Loading Membership Plans...</div>}>
+                <div className="border-t border-slate-200 pt-8">
                   <MembershipPlans currentUserId={user?._id} currentTier="member" />
-                </Suspense>
+                </div>
               </div>
             </TabsContent>
             {/* Profile Tab */}
             <TabsContent value="profile" className="p-6">
               {isAuthenticated && user ? (
-                <Suspense fallback={<div>Loading Profile...</div>}>
-                  <UserProfile
-                    userId={user._id || user.id}
-                    isOwnProfile={true}
-                  />
-                </Suspense>
+                <UserProfile
+                  userId={user._id || user.id}
+                  isOwnProfile={true}
+                />
               ) : (
                 <div className="text-center py-12">
                   <p className="text-gray-500 mb-4">กรุณาเข้าสู่ระบบเพื่อดูโปรไฟล์</p>
@@ -1783,6 +1780,12 @@ function App() {
       {selectedProfile && (
         <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
           <DialogContent className="max-w-none bg-white/90 backdrop-blur-md border border-white/20 shadow-2xl rounded-2xl p-0 overflow-hidden" style={{ width: '1400px', height: '900px', minWidth: '1400px', minHeight: '900px' }}>
+            <VisuallyHidden>
+              <DialogTitle>Profile of {selectedProfile.name}</DialogTitle>
+              <DialogDescription>
+                View detailed profile information for {selectedProfile.name}, age {selectedProfile.age} from {selectedProfile.location}
+              </DialogDescription>
+            </VisuallyHidden>
             <div className="flex h-full">
               {/* Image Gallery */}
               <div className="w-1/2 relative">

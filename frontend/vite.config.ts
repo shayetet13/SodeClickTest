@@ -4,28 +4,31 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 5173,
+    open: true
+  },
   build: {
     rollupOptions: {
       output: {
         manualChunks(id) {
           // Split node_modules into separate chunks
           if (id.includes('node_modules')) {
-            return 'vendor'
+            return 'vendor';
           }
           
-          // Split services into their own chunks
-          if (id.includes('/services/')) {
-            return 'services'
+          // Split large modules into separate chunks
+          if (id.includes('src/services/')) {
+            return 'services';
           }
           
-          // Split components into their own chunks
-          if (id.includes('/components/')) {
-            return 'components'
+          if (id.includes('src/components/')) {
+            return 'components';
           }
         }
       }
     },
     chunkSizeWarningLimit: 1000, // Increase chunk size warning limit
-    sourcemap: false // Disable sourcemaps for production
+    sourcemap: false // Disable sourcemaps in production
   }
 })

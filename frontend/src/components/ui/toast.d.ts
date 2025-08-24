@@ -11,9 +11,10 @@ export interface ToastOptions {
   duration?: number;
 }
 
-export const ToastProvider: React.FC<ToastProviderProps>;
-export function useToast(): {
+export interface ToastContextType {
   toast: (options: ToastOptions) => void;
-  dismiss: () => void;
   ToastContainer?: React.ComponentType;
-};
+}
+
+export const ToastProvider: React.FC<ToastProviderProps>;
+export function useToast(): ToastContextType;

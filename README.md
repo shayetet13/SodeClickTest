@@ -1,44 +1,45 @@
-# Love Project Deployment Guide
+# Love Dating Application - Railway Deployment
 
-## Environment Setup
+## Deployment Configuration
 
-### Development
-1. Clone the repository
-2. Install dependencies
-   ```bash
-   cd frontend && npm install
-   cd ../backend && npm install
-   ```
-3. Set up local MongoDB
-4. Create `.env.development` files
-   - Frontend: `VITE_API_URL=http://localhost:5000/api`
-   - Backend: `MONGODB_URI=mongodb://localhost:27017/love_dev`
+This project is configured for deployment on Railway using Nixpacks.
 
-### Production Deployment on Railway
+### Deployment Steps
 
-#### Frontend
-- Build Command: `npm run build`
-- Start Command: `npm run preview`
-- Port: 8080
-- Environment Variables:
-  - `VITE_API_URL`: Backend API URL
-  - `VITE_APP_ENV`: production
+1. Ensure you have the following environment variables set in Railway:
+   - `MONGODB_URI`: Connection string for MongoDB
+   - `JWT_SECRET`: Secret key for JWT authentication
+   - `RAILWAY_STATIC_URL`: URL of the deployed application
+   - `CLOUDINARY_CLOUD_NAME`: Cloudinary cloud name
+   - `CLOUDINARY_API_KEY`: Cloudinary API key
+   - `CLOUDINARY_API_SECRET`: Cloudinary API secret
 
-#### Backend
-- Build Command: `npm run build`
-- Start Command: `npm run start:prod`
-- Port: 5000
-- Environment Variables:
-  - `MONGODB_URI`: MongoDB Atlas Connection String
-  - `NODE_ENV`: production
+2. The deployment uses Nixpacks to build and start the application:
+   - Builds frontend with `pnpm`
+   - Installs backend dependencies
+   - Starts the backend server
 
-## Deployment Checklist
-- [ ] Set up MongoDB Atlas
-- [ ] Configure Railway environments
-- [ ] Set environment variables
-- [ ] Test deployment
+### Deployment Configuration Files
 
-## Troubleshooting
-- Check Railway logs
-- Verify environment variables
-- Ensure MongoDB connection is correct
+- `nixpacks.toml`: Defines build and start commands
+- `Procfile`: Specifies the web process to run
+- `backend/.env.production`: Production environment variables
+
+### Troubleshooting
+
+- Ensure all required environment variables are set
+- Check Railway logs for any deployment or runtime errors
+- Verify MongoDB connection and authentication
+
+## Local Development
+
+```bash
+# Install dependencies
+pnpm install:all
+
+# Run frontend
+pnpm start:frontend
+
+# Run backend
+pnpm start:backend
+```

@@ -1,39 +1,19 @@
 {
   "name": "love-project",
   "version": "1.0.0",
-  "description": "Full-stack project with React + Vite + TailwindCSS + Shadcn/UI frontend and Express.js + MongoDB backend",
-  "main": "index.js",
+  "description": "Love Dating Application",
   "scripts": {
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev",
-    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
-    "start:frontend": "cd frontend && npm run dev",
-    "start:backend": "cd backend && npm start",
-    "install-all": "npm install && cd frontend && npm install && cd ../backend && npm install",
-    "build": "cd frontend && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install:all": "pnpm install -r",
+    "build:frontend": "cd frontend && pnpm run build",
+    "build:backend": "cd backend && pnpm install",
+    "build": "pnpm run build:frontend && pnpm run build:backend",
+    "start:frontend": "cd frontend && pnpm run dev",
+    "start:backend": "cd backend && node server.js",
+    "start:prod": "cd backend && node server.js"
   },
-  "keywords": [
-    "react",
-    "vite",
-    "tailwindcss",
-    "shadcn",
-    "express",
-    "mongodb",
-    "fullstack"
-  ],
+  "keywords": ["dating", "app"],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "concurrently": "^8.2.2",
-    "cross-env": "^10.0.0",
-    "postcss": "^8.5.6",
-    "shx": "^0.4.0",
-    "tailwindcss": "^4.1.11"
-  },
-  "dependencies": {
-    "socket.io-client": "^4.8.1"
-  }
+  "devDependencies": {},
+  "dependencies": {}
 }

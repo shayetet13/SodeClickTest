@@ -1,0 +1,11 @@
+[build]
+cmd = "cd frontend && pnpm install && pnpm run build && cd ../backend && pnpm install"
+
+[start]
+cmd = "cd backend && node server.js"
+
+[phases.environment]
+NODE_VERSION = "20"
+
+[phases.setup]
+aptPkgs = ["nodejs", "npm"]
