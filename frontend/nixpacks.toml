@@ -1,0 +1,17 @@
+[build]
+cmd = "npm run build"
+
+[start]
+cmd = "npm run preview"
+
+[variables]
+PORT = "8080"
+
+[phases]
+setup = [
+    "nodejs=18"
+]
+
+[deploy]
+strategy = "static"
+path = "dist"
